@@ -336,16 +336,3 @@ Content-Type: application/json
 
 ---
 
-### 5. Negative Test Cases
-| Scenario | Request | Expected Status | Expected Response Message |
-|---|---|---|---|
-| Missing Token | Any private endpoint without Authorization header | `401 Unauthorized` | `"Access denied. Missing or invalid Authorization header format. Expected Bearer <token>."` |
-| Invalid Token | `Authorization: Bearer invalid_token_here` | `401 Unauthorized` | `"Invalid or expired token."` |
-| Duplicate Email | Register with existing email | `409 Conflict` | `"A user with this email already exists."` |
-| Invalid Password | Login with incorrect password | `401 Unauthorized` | `"Invalid email or password."` |
-| Short Password | Register with `< 8` characters | `400 Bad Request` | `"Password must be at least 8 characters long."` |
-| Invalid Email Format | Register/Doctor with `bad-email` | `400 Bad Request` | `"Please provide a valid email address."` |
-| Invalid ID | `GET /api/patients/abc/` | `400 Bad Request` | `"Invalid patient ID. Must be an integer."` |
-| Duplicate Mapping | Re-assign same doctor to same patient | `409 Conflict` | `"This doctor is already assigned to this patient."` |
-| Cross-User Access | Query or update another user's patient/doctor | `404 Not Found` | `"Patient not found."` or `"Doctor not found."` |
-| Non-existent Record | `GET /api/patients/9999/` | `404 Not Found` | `"Patient not found."` |
