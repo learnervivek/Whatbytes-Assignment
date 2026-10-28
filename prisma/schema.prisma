@@ -1,0 +1,72 @@
+// Prisma schema file
+
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// 1. User Model (System users / Doctors / Admins who login)
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+
+  // Relationships
+  patients       Patient[]
+  doctors        Doctor[]
+  patientDoctors PatientDoctor[]
+}
+
+// 2. Patient Model
+model Patient {
+  id          Int      @id @default(autoincrement())
+  name        String
+  age         Int
+  gender      String
+  address     String?
+  createdById Int
+  createdBy   User     @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationships
+  patientDoctors PatientDoctor[]
+}
+
+// 3. Doctor Model
+model Doctor {
+  id             Int      @id @default(autoincrement())
+  name           String
+  specialization String
+  email          String
+  phone          String?
+  createdById    Int
+  createdBy      User     @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // Relationships
+  patientDoctors PatientDoctor[]
+}
+
+// 4. PatientDoctor Model (Many-to-Many Mapping between Patient and Doctor)
+model PatientDoctor {
+  id          Int      @id @default(autoincrement())
+  patientId   Int
+  patient     Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  doctorId    Int
+  doctor      Doctor   @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  createdById Int
+  createdBy   User     @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+
+  // Prevents assigning the same patient to the same doctor multiple times
+  @@unique([patientId, doctorId])
+}
